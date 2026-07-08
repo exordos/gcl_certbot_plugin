@@ -15,8 +15,8 @@
 #    under the License.
 from __future__ import annotations
 
-import os
 import logging
+import os
 import typing as tp
 
 from acme import challenges
