@@ -23,7 +23,7 @@ from gcl_sdk.clients.http import base as core_client_base
 from gcl_certbot_plugin import acme
 from gcl_certbot_plugin import clients as dns_clients
 
-DEFAULT_PRIVATE_KEY_PATH = "/etc/genesis_core/certbot/privkey.pem"
+DEFAULT_PRIVATE_KEY_PATH = "/etc/exordos_core/certbot/privkey.pem"
 
 
 def issue_cert_dns_core(
@@ -67,20 +67,21 @@ if __name__ == "__main__":
 
     python create_cert.py \
         --domain test.pdns.your.domain \
-        --email admin@genesis-core.tech \
-        --endpoint http://10.20.0.2:11010
+        --email infra@exordos.com \
+        --endpoint http://10.20.0.2:80/api/core \
         --core-user test \
         --core-password test
     """
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--domain", type=str, required=True)
-    parser.add_argument(
-        "--email", type=str, default="admin@genesis-core.tech", required=True
-    )
+    parser.add_argument("--email", type=str, required=True)
     parser.add_argument("-l", "--endpoint", type=str, required=True)
     parser.add_argument("-u", "--core-user", type=str, required=True)
     parser.add_argument("-p", "--core-password", type=str, required=True)
+    parser.add_argument(
+        "--private-key-path", type=str, default=DEFAULT_PRIVATE_KEY_PATH
+    )
     args = parser.parse_args()
 
     domains = [args.domain]
@@ -92,4 +93,6 @@ if __name__ == "__main__":
 
     print(f"Issue a cert for domains: {domains}")
 
-    issue_cert_dns_core(domains, args.email, dns_client)
+    issue_cert_dns_core(
+        domains, args.email, dns_client, private_key_path=args.private_key_path
+    )

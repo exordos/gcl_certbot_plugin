@@ -13,11 +13,10 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-import uuid as sys_uuid
 import typing as tp
+import uuid as sys_uuid
 
 import bazooka
-
 from gcl_sdk.clients.http import base
 
 
