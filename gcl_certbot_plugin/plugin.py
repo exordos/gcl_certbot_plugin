@@ -30,15 +30,13 @@ class Authenticator(dns_common.DNSAuthenticator):
     description = "Obtain certificates with Genesis Core DNS server"
 
     def __init__(self, *args, **kwargs):
-        super(Authenticator, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         self._records_to_cleanup_map = {}
 
     @classmethod
     def add_parser_arguments(cls, add):  # pylint: disable=arguments-differ
-        super(Authenticator, cls).add_parser_arguments(
-            add, default_propagation_seconds=0
-        )
+        super().add_parser_arguments(add, default_propagation_seconds=0)
         add(
             "endpoint",
             help="Core API endpoint.",

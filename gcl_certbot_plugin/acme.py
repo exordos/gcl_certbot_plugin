@@ -110,7 +110,7 @@ def get_acme_client(
     except errors.Error as e:
         if (
             hasattr(e, "typ")
-            and getattr(e, "typ") == "urn:ietf:params:acme:error:accountDoesNotExist"
+            and e.typ == "urn:ietf:params:acme:error:accountDoesNotExist"
         ):
             LOG.info("Create new account for email: %s", email)
             client.net.account = client.new_account(
