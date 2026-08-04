@@ -35,8 +35,8 @@ from gcl_certbot_plugin import clients as dns_clients
 LOG = logging.getLogger(__name__)
 
 
-# This is the staging point for ACME-V2 within Let's Encrypt.
-DIRECTORY_URL = "https://acme-staging-v02.api.letsencrypt.org/directory"
+DIRECTORY_URL_STAGING = "https://acme-staging-v02.api.letsencrypt.org/directory"
+DIRECTORY_URL_PROD = "https://acme-v02.api.letsencrypt.org/directory"
 USER_AGENT = "python-acme-example"
 
 # Account key size
@@ -80,7 +80,7 @@ def get_acme_client(
     private_client_key: rsa.RSAPrivateKey,
     email: str,
     user_agent: str = USER_AGENT,
-    directory_url: str = DIRECTORY_URL,
+    directory_url: str = DIRECTORY_URL_PROD,
 ) -> acme_lib_client.ClientV2:
     """Get ACME client."""
     acc_key = jose.JWKRSA(key=private_client_key)

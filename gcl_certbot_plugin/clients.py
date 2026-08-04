@@ -54,16 +54,16 @@ class TinyDNSCoreClient:
 
         # Try to find target zone iteratively.
         while parent_domain:
-            try:
-                parent_domain = parent_domain.split(".", 1)[1]
-            except IndexError:
-                raise ValueError(f"Could not find DNS zone for domain {domain}")
-
             domains = self.domains.filter(domains_collection, name=parent_domain)
             if domains:
                 name = domain[: -len(parent_domain)]
                 zone = domains[0]
                 break
+
+            try:
+                parent_domain = parent_domain.split(".", 1)[1]
+            except IndexError:
+                raise ValueError(f"Could not find DNS zone for domain {domain}")
 
         if prefix:
             name = f"{prefix}.{name}"
