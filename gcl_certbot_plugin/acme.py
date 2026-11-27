@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import logging
 import os
+import time
 import typing as tp
 
 from acme import challenges
@@ -28,6 +29,8 @@ from cryptography import x509
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
+import dns.exception
+import dns.resolver
 import josepy as jose
 
 from gcl_certbot_plugin import clients as dns_clients
@@ -197,6 +200,44 @@ def dns_records_for_challenge(
     return records
 
 
+def wait_for_dns01(domains: tp.Collection[str], validation: str) -> None:
+    """Wait for the exact challenge token at two independent public resolvers.
+
+    Core's DNS and recursive resolvers can cache an earlier TXT RRset or
+    NXDOMAIN. Do not consume a CA authorization attempt until both see the
+    new token. Leave a short propagation grace period, as Certbot does.
+    """
+    pending = {
+        ("_acme-challenge." + domain.removeprefix("*."), server)
+        for domain in domains
+        for server in ("8.8.8.8", "9.9.9.9")
+    }
+    deadline = time.monotonic() + 180
+    while pending:
+        for name, server in sorted(pending):
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                raise TimeoutError("DNS-01 TXT records did not propagate in time")
+            resolver = dns.resolver.Resolver(configure=False)
+            resolver.nameservers = [server]
+            resolver.lifetime = min(5, remaining)
+            try:
+                answer = resolver.resolve(name, "TXT")
+            except dns.exception.DNSException:
+                continue
+            if any(
+                b"".join(record.strings) == validation.encode("ascii")
+                for record in answer
+            ):
+                pending.remove((name, server))
+        if pending:
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                raise TimeoutError("DNS-01 TXT records did not propagate in time")
+            time.sleep(min(5, remaining))
+    time.sleep(10)
+
+
 def perform_dns01(
     domains: tp.Collection[str],
     acme_client: acme_lib_client.ClientV2,
@@ -215,6 +256,7 @@ def perform_dns01(
             response, validation = challb.response_and_validation(acme_client.net.key)
 
             records += dns_records_for_challenge(domains, dns_client, validation)
+            wait_for_dns01(domains, validation)
 
             # Let the CA server know that we are ready for the challenge.
             acme_client.answer_challenge(challb, response)
