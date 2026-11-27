@@ -554,6 +554,7 @@ dependencies = [
     { name = "bazooka" },
     { name = "certbot" },
     { name = "cryptography" },
+    { name = "dnspython" },
     { name = "gcl-iam" },
     { name = "gcl-sdk" },
 ]
@@ -586,6 +587,7 @@ requires-dist = [
     { name = "certbot", specifier = ">=3.0.0,<6.0.0" },
     { name = "coverage", marker = "extra == 'test'", specifier = ">=4.0" },
     { name = "cryptography", specifier = ">=45.0.5,<51.0.0" },
+    { name = "dnspython", specifier = ">=2.6.0,<3.0.0" },
     { name = "gcl-iam", specifier = ">=0.11.0,<2.0.0" },
     { name = "gcl-sdk", specifier = ">=0.4.0,<4.0.0" },
     { name = "mock", marker = "extra == 'test'", specifier = ">=3.0.5,<6.0.0" },
